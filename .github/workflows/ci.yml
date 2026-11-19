@@ -1,5 +1,5 @@
 
-name: CI Pipeline
+name: CI Pipeline Multi-Jobs
 
 on:
   push:
@@ -13,14 +13,15 @@ on:
   workflow_dispatch:
 
 jobs:
-  ci:
+
+  lint:
     runs-on: ubuntu-latest
 
     steps:
       - name: Recuperer le code
         uses: actions/checkout@v4
 
-      - name: Installer Python 3.11
+      - name: Installer Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -28,11 +29,30 @@ jobs:
       - name: Installer les dependances
         run: pip install -r requirements.txt
 
-      - name: Analyse statique avec Flake8
+      - name: Installer Flake8
+        run: pip install flake8
+
+      - name: Executer Lint
         run: |
           flake8 app --count --select=E9,F63,F7,F82,F841 --show-source --statistics
           flake8 app --count --max-complexity=10 --max-line-length=127 --statistics
           flake8 tests --count --max-line-length=127 --statistics
 
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Recuperer le code
+        uses: actions/checkout@v4
+
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Installer les dependances
+        run: pip install -r requirements.txt
+
       - name: Executer les tests
-        run: python -m pytest -v --cov=app
+        run: python -m pytest tests/ -v --cov=app
