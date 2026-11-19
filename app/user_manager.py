@@ -31,5 +31,4 @@ class UserManager:
 
 
 def count_total_users(users):
-    temp = 0
     return len(users)
