@@ -32,9 +32,7 @@ def test_add_empty_user():
 
 
 def test_remove_user():
-
     manager = UserManager()
-
     manager.add_user("Ali")
     manager.remove_user("Ali")
 
